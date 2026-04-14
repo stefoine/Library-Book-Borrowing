@@ -20,4 +20,9 @@ class Borrow_Record extends Model
     {
         return $this->belongsTo('App\Models\Student_Profile', 'student_profile_id');
     }   
+
+    public function copy()
+    {
+        return $this->belongsTo('App\Models\Book_Copy', 'copy_id');
+    }
 }

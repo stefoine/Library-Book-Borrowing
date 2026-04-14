@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
-#[Fillable(['title', 'author', 'genre'])]
+use Illuminate\Database\Eloquent\Factories\HasMany;
 
 class Book extends Model
 {
-    //RELATIONSHIPS
-    public function bookCopies(): HasMany
+    protected $fillable = [
+        'title',
+        'author',
+        'genre',
+    ];
+
+    // Book has many copies
+    public function copies()
     {
-        return $this->hasMany('App\Models\Book_Copy');
+        return $this->hasMany(\App\Models\BookCopy::class, 'book_id');
     }
 }

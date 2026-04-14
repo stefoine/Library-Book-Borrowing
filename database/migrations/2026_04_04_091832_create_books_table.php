@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('author')->nullable();
             $table->string('genre')->nullable();
+            $table->timestamps();
         });
     }
 

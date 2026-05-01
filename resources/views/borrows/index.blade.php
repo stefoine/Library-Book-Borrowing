@@ -1,29 +1,50 @@
-<h1>My Borrowed Books</h1>
+@extends('layouts.app')
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Book</th>
-            <th>Borrow Date</th>
-            <th>Return Date</th>
-            <th>Status</th>
-        </tr>
-    </thead>
+@section('content')
+<div class="container">
+    <h1>Books</h1>
+    
+    @if(auth()->user()->is_admin)
+        <a href="{{ route('books.create') }}" class="btn btn-primary mb-3">Add New Book</a>
+    @endif
 
-    <tbody>
-        @foreach($borrows as $borrow)
+    <table class="table">
+        <thead>
             <tr>
-                <td>{{ $borrow->copy->book->title }}</td>
-                <td>{{ $borrow->borrow_date }}</td>
-                <td>{{ $borrow->return_date ?? 'Not returned' }}</td>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($books as $book)
+            <tr>
+                <td>{{ $book->title }}</td>
+                <td>{{ $book->author }}</td>
+                <td>{{ $book->stock }}</td>
                 <td>
-                    @if($borrow->return_date)
-                        <span class="text-success">Returned</span>
-                    @else
-                        <span class="text-danger">Borrowed</span>
+                    {{-- Users can Borrow --}}
+                    @if($book->stock > 0)
+                        <form action="{{ route('borrows.store') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="book_id" value="{{ $book->id }}">
+                            <button class="btn btn-sm btn-success">Borrow</button>
+                        </form>
+                    @endif
+
+                    {{-- REQUIREMENT: Hide Edit/Delete for non-admins --}}
+                    @if(auth()->user()->is_admin)
+                        <a href="{{ route('books.edit', $book->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" style="display:inline;">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
                     @endif
                 </td>
             </tr>
-        @endforeach
-    </tbody>
-</table>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endsection

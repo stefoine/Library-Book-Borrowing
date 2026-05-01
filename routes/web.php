@@ -1,34 +1,29 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BorrowRecordController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\BorrowDetailController;
+use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
-    return view('welcome');
+Auth::routes();
+
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard / Home
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+    // Books & Borrowing (Accessible by everyone authenticated)
+    Route::resource('books', BookController::class);
+    Route::resource('borrows', BorrowDetailController::class);
+
+    // REQUIREMENT: Only admin users can manage Users
+    Route::middleware(['can:admin-only'])->group(function () {
+        Route::resource('users', UserController::class);
+    });
+
+    // REQUIREMENT: Users can only view their own account
+    Route::get('/my-account', [UserController::class, 'showSelf'])->name('account.me');
 });
+Auth::routes();
 
-Route::resource('books', BookController::class);
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__.'/auth.php';
-
-Route::middleware('auth')->group(function () {
-
-    Route::post('/borrow', [BorrowRecordController::class, 'store'])
-        ->name('borrow.store');
-
-    Route::post('/return/{id}', [BorrowRecordController::class, 'return'])
-        ->name('borrow.return');
-
-});
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

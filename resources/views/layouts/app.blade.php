@@ -31,6 +31,25 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <!-- Left Side Of Navbar -->
+<ul class="navbar-nav me-auto">
+    @auth
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('books.index') }}">Books</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('borrows.index') }}">My Borrows</a>
+        </li>
+        
+        {{-- Show User Management only to Admins --}}
+        @if(auth()->user()->is_admin)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('users.index') }}">Manage Users</a>
+            </li>
+        @endif
+    @endauth
+</ul>
         </div>
     </body>
 </html>

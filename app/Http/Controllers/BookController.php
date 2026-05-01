@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
+use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
     public function index()
     {
-        $books = Book::with('copies.borrowRecords')->get();
-
+        $books = Book::all();
         return view('books.index', compact('books'));
     }
 
@@ -24,50 +23,28 @@ class BookController extends Controller
         $request->validate([
             'title' => 'required',
             'author' => 'required',
-            'genre' => 'nullable',
+            'isbn' => 'required|unique:books',
+            'stock' => 'required|integer'
         ]);
 
-        Book::create($request->only('title', 'author', 'genre'));
-
-        return redirect()->route('books.index')
-            ->with('success', 'Book created successfully!');
+        Book::create($request->all());
+        return redirect()->route('books.index')->with('success', 'Book added!');
     }
 
-    public function show($id)
+    public function edit(Book $book)
     {
-        $book = Book::with('copies.borrowRecords')->findOrFail($id);
-
-        return view('books.show', compact('book'));
-    }
-
-    public function edit($id)
-    {
-        $book = Book::findOrFail($id);
-
         return view('books.edit', compact('book'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Book $book)
     {
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'genre' => 'nullable',
-        ]);
-
-        $book = Book::findOrFail($id);
-
-        $book->update($request->only('title', 'author', 'genre'));
-
-        return redirect()->route('books.index')
-            ->with('success', 'Book updated successfully!');
+        $book->update($request->all());
+        return redirect()->route('books.index')->with('success', 'Book updated!');
     }
 
-    public function destroy($id)
+    public function destroy(Book $book)
     {
-        Book::findOrFail($id)->delete();
-
-        return redirect()->route('books.index')
-            ->with('success', 'Book deleted successfully!');
+        $book->delete();
+        return redirect()->route('books.index');
     }
 }
